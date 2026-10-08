@@ -1,0 +1,8 @@
+{
+  "name": "NFL Pick'em",
+  "description": "Head-to-head NFL game pick'em competition with alternating draft selections, underdog & primetime bonus points, live scoring, and cumulative season standings.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 64;
+    }
+
+    function isValidSeasonState(data) {
+      return data.seasonYear is number &&
+             data.lastUpdated is string;
+    }
+
+    function isValidWeek(data) {
+      return data.weekNumber is number &&
+             data.weekNumber >= 1 && data.weekNumber <= 18 &&
+             (data.onTheClock == 'Corey' || data.onTheClock == 'Joel') &&
+             (data.draftOrderFirst == 'Corey' || data.draftOrderFirst == 'Joel') &&
+             data.games is list;
+    }
+
+    // Connection test document
+    match /test/{docId} {
+      allow read: if true;
+    }
+
+    // Season metadata and state
+    match /seasons/{seasonId} {
+      allow read: if true;
+      allow create, update: if isValidId(seasonId) && isValidSeasonState(request.resource.data);
+      allow delete: if false;
+
+      // Individual weeks
+      match /weeks/{weekNumber} {
+        allow read: if true;
+        allow create, update: if isValidWeek(request.resource.data);
+        allow delete: if false;
+      }
+
+      // Permanent game picks archive
+      match /picks_archive/{pickId} {
+        allow read: if true;
+        allow create, update: if isValidId(pickId);
+        allow delete: if false;
+      }
+
+      // Permanent immutable audit history
+      match /audit_history/{snapshotId} {
+        allow read: if true;
+        allow create, update: if isValidId(snapshotId);
+        allow delete: if false;
+      }
+
+      // Permanent change log / audit trail for all game and pick edits
+      match /change_log/{logId} {
+        allow read: if true;
+        allow create, update: if isValidId(logId);
+        allow delete: if false;
+      }
+    }
+
+    // Default deny all other paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "SeasonState": {
+      "title": "SeasonState",
+      "description": "Global state and metadata for the 2026-27 NFL Pick'em season",
+      "type": "object",
+      "properties": {
+        "seasonYear": {
+          "type": "number",
+          "description": "The NFL season year (e.g., 2026)"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "description": "ISO timestamp of last update"
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "User email or identifier who updated the season state"
+        }
+      },
+      "required": ["seasonYear", "lastUpdated"]
+    },
+    "Week": {
+      "title": "Week",
+      "description": "Data, games, draft state, and stats for an NFL Pick'em week",
+      "type": "object",
+      "properties": {
+        "weekNumber": {
+          "type": "number",
+          "description": "Week number from 1 to 18"
+        },
+        "onTheClock": {
+          "type": "string",
+          "description": "Player on the clock ('Corey' | 'Joel')"
+        },
+        "draftOrderFirst": {
+          "type": "string",
+          "description": "Player picking first in the week ('Corey' | 'Joel')"
+        },
+        "games": {
+          "type": "array",
+          "description": "List of NFL games for this week"
+        },
+        "stats": {
+          "type": "object",
+          "description": "Calculated weekly stats for Corey and Joel"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "description": "ISO timestamp of the latest week update"
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "User identifier who performed the update"
+        }
+      },
+      "required": ["weekNumber", "onTheClock", "draftOrderFirst", "games"]
+    },
+    "PickRecord": {
+      "title": "PickRecord",
+      "description": "Permanent individual game pick record archive",
+      "type": "object",
+      "properties": {
+        "weekNumber": { "type": "number" },
+        "gameId": { "type": "string" },
+        "picker": { "type": "string" },
+        "pick": { "type": "string" },
+        "potentialPoints": { "type": "number" },
+        "earnedPoints": { "type": "number" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["weekNumber", "gameId", "picker", "pick"]
+    },
+    "AuditSnapshot": {
+      "title": "AuditSnapshot",
+      "description": "Permanent immutable audit log of draft picks and weekly states",
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string" },
+        "action": { "type": "string" },
+        "weekNumber": { "type": "number" },
+        "updatedBy": { "type": "string" }
+      },
+      "required": ["timestamp", "action", "weekNumber"]
+    }
+  },
+  "firestore": {
+    "/seasons/{seasonId}": {
+      "schema": "SeasonState",
+      "description": "Overall season state document"
+    },
+    "/seasons/{seasonId}/weeks/{weekNumber}": {
+      "schema": "Week",
+      "description": "Per-week games, draft selections, and scores"
+    },
+    "/seasons/{seasonId}/picks_archive/{pickId}": {
+      "schema": "PickRecord",
+      "description": "Permanent archive of each individual game pick"
+    },
+    "/seasons/{seasonId}/audit_history/{snapshotId}": {
+      "schema": "AuditSnapshot",
+      "description": "Immutable audit snapshot log of week pick updates"
+    }
+  }
+}
